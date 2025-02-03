@@ -31,7 +31,6 @@ def index():
 
 @app.route("/add", methods=["GET", "POST"])
 def add():
-    """Handle adding a new blog post."""
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         author = request.form.get("author", "").strip()
@@ -39,12 +38,14 @@ def add():
 
         if title and author and content:
             blog_posts = load_posts()
+            # Eindeutige ID berechnen
+            new_id = max((post["id"] for post in blog_posts), default=0) + 1
             new_post = {
-                "id": len(blog_posts) + 1,
+                "id": new_id,
                 "title": title,
                 "author": author,
                 "content": content,
-                "likes": 0  # Ensure likes field exists
+                "likes": 0
             }
             blog_posts.append(new_post)
             save_posts(blog_posts)
@@ -52,6 +53,8 @@ def add():
         return redirect(url_for("index"))
 
     return render_template("add.html")
+
+
 
 
 @app.route('/delete/<int:post_id>')
@@ -96,4 +99,4 @@ def like(post_id: int):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
